@@ -26,9 +26,9 @@ body.append(progressBar);
 const calcularProcentajeScroll = ( event ) => {
     
     const {
-        scrollTop,
+        clientHeight,
         scrollHeight,
-        clientHeight
+        scrollTop,
     } = event.target.documentElement;
 
     return ( scrollTop / ( scrollHeight - clientHeight ) ) * 100;

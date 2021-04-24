@@ -1,55 +1,50 @@
-import { Observable, Observer, Subject } from 'rxjs';
-
-const observer: Observer<any> = {
-    next : value => console.log('next:', value ),
-    error: error => console.warn('error:', error ),
-    complete: () => console.info('completado')
-};
-
-const intervalo$ = new Observable<number>( subs => { // el number es el tipo de dato que va a retornar el observable
-
-    const intervalID =  setInterval(() => {
-        subs.next( Math.random() ) // genera numeros random
-    }, 1000);
-    
-
-    return () => { // cuando se realiza el subscribe se dispara este codigo
-        clearInterval( intervalID );
-        console.log('Intervalo destruido')
-    };
-
-});
-
-/**
- * 1- Casteo múltiple
- * 2- También es un observer
- * 3- Next, error y complete
- */
-
-const subject$ = new Subject(); // cuando tiene el simbolo de dolar es por q es un obervable
-const subscription = intervalo$.subscribe( subject$ );  // con subscribe empieza a ejecutarse la funcion dentro de intervalo$
+import { from } from 'rxjs';
+import { reduce, scan, map } from 'rxjs/operators';
 
 
-// const subs1 = intervalo$.subscribe( rnd => console.log('subs1', rnd) ); //ejecuta el codigo que esta en intervalo$
-// const subs2 = intervalo$.subscribe( rnd => console.log('subs2', rnd) );
+const numeros = [1,2,3,4,5];
 
-// ejecuta dos subcris pero por medio de un subject, el cual continen la misma información
-// lo contarrio de subcribe qu genera dos instancias diferentes, el subject es una sola instancia
-// para pordelo llamar de diferentes partes de codigo y retorne la misma información para todos
-const subs1 = subject$.subscribe( observer );
-const subs2 = subject$.subscribe( observer );
+// const totalAcumulador = (acc, cur) => {
+//     return acc + cur;
+// }
+const totalAcumulador = (acc: number, cur: number) => acc + cur;
 
+// Reduce
+from( numeros ).pipe(
+    reduce( totalAcumulador, 0 )
+)
+.subscribe( r => console.log('reduse: ', r) );
 
-setTimeout( () => {
+// Scan
+from( numeros ).pipe(
+    scan( totalAcumulador, 0 )
+)
+.subscribe(r => console.log('scan: ', r) );
 
-    // como el subject es un observe tiene tambien el metodo next, compete and error
-    subject$.next(10); // este metodo es como el setState, modifica el observable con 10
-                       // y de donde esten los subscribe escuchando van a obtener ese dato
-                       // es conocido como un Hot Observable, el por defecto o interno es el Cold Observable
+// Redux
+interface Usuario {
+    id?: string; // ? es opcional
+    autenticado?: boolean;
+    token?: string;
+    edad?: number;
+}
 
-    subject$.complete(); // termina la ejecusiojn del codigo pero no lo destruye
+const user: Usuario[] = [
+    { id: 'fher1', autenticado: false, token: null },
+    { id: 'fher2', autenticado: true, token: 'ABC' },
+    { id: 'fher3', autenticado: true, token: 'ABC123' },
+];
 
-    subscription.unsubscribe(); // este si lo destruye
+const state$ = from( user ).pipe(
+    scan<Usuario>( (acc, cur) => {
+        return { ...acc, ...cur }
+    }, { edad: 33 })// agrea una varial al estado inicial
+);
 
-}, 3500 );
+const id$ = state$.pipe(
+    map( state => state.id )
+);
+
+id$.subscribe( console.log );
+
 

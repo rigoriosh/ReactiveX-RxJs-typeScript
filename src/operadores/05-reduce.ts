@@ -12,7 +12,7 @@ const total = numbers.reduce( totalReducer, 0 );
 console.log('total arr', total );
 
 interval(500).pipe(
-    take(6),
+    take(6), // operador take, es como un brake
     tap( console.log ),
     reduce( totalReducer )
 )
