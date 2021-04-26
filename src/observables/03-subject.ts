@@ -20,7 +20,7 @@ const intervalo$ = new Observable<number>( subs => { // el number es el tipo de 
 
 });
 
-/**
+/** Caracteristicas del subject
  * 1- Casteo múltiple
  * 2- También es un observer
  * 3- Next, error y complete
