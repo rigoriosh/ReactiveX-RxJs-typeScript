@@ -3,14 +3,11 @@ import { tap, map, mergeMap, pluck, catchError, switchMap, exhaustMap } from 'rx
 import { ajax } from 'rxjs/ajax';
 
 // Helper
-const peticionHttpLogin = ( userPass ) => 
-    ajax.post('https://reqres.in/api/login?delay=1', userPass)
+const peticionHttpLogin = ( userPass ) => ajax.post('https://reqres.in/api/login?delay=1', userPass)
         .pipe(
             pluck('response', 'token'),
             catchError( err => of('xxx') )
         )
-
-
 
 // creando un formulario
 const form = document.createElement('form');
@@ -36,11 +33,16 @@ document.querySelector('body').append( form );
 const submitForm$ = fromEvent<Event>( form, 'submit' )
     .pipe(
         tap( ev => ev.preventDefault() ),
-        map( ev => ({
-            email: ev.target[0].value,
-            password: ev.target[1].value
-        })),
-        exhaustMap( peticionHttpLogin )
+        map( ev => {
+            const data = {
+                email: ev.target[0].value,
+                password: ev.target[1].value
+            }
+            return data;
+        }),
+        //mergeMap(peticionHttpLogin)
+        //switchMap(peticionHttpLogin)
+        exhaustMap( data => peticionHttpLogin(data) )
     );
 
 
