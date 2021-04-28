@@ -1,4 +1,4 @@
-import { interval, timer } from 'rxjs';
+import { combineLatest, interval, timer } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 /**
  * Ejercicio: Combinar ambos observables (letras$, numeros$)
@@ -6,7 +6,7 @@ import { map, take } from 'rxjs/operators';
  * valores emitidos
  */
 
-//  Ejemplo de la tada esperada:
+//  Ejemplo de la data esperada:
 // a1
 // a2
 // b2
@@ -43,13 +43,9 @@ import { map, take } from 'rxjs/operators';
     // de estar procesada en su totalidad
     // ========================================
 
-
-
-
-
-
-
-
+    combineLatest(letras$, numeros$).pipe(
+        map(([a,b])=>a + b)
+    ).subscribe(console.log)
 
 })();
 

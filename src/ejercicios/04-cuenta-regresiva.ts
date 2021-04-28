@@ -1,4 +1,5 @@
 import { interval } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
 /**
  * Ejercicio: Realizar una cuenta regresiva
@@ -21,6 +22,8 @@ import { interval } from 'rxjs';
     const countdown$ = interval(700).pipe(
         // Usar los operadores necesarios
         // para realizar la cuenta regresiva
+        map(i => inicio - i),
+        take(inicio + 1)
     );
     
 

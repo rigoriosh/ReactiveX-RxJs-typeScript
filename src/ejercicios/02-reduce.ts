@@ -1,4 +1,5 @@
 import { from } from 'rxjs';
+import { filter, reduce } from 'rxjs/operators';
 
 /**
  * Ejercicio: 
@@ -18,7 +19,9 @@ import { from } from 'rxjs';
 
   from(datos).pipe(
     // Trabajar aquí
-
+    
+    filter<any>(val => !isNaN(val)), //dejar pasar solo los numeros
+    reduce((acumulado, actual)=>acumulado + actual) //realizar la operación
 
   ).subscribe( console.log ) // La salida debe de ser 32
 

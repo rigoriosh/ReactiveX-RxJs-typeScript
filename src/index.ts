@@ -1,51 +1,66 @@
-import { fromEvent, of } from 'rxjs';
-import { tap, map, mergeMap, pluck, catchError, switchMap, exhaustMap } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
+import { switchMap, map } from 'rxjs/operators';
+import { zip, of } from 'rxjs';
 
-// Helper
-const peticionHttpLogin = ( userPass ) => ajax.post('https://reqres.in/api/login?delay=1', userPass)
-        .pipe(
-            pluck('response', 'token'),
-            catchError( err => of('xxx') )
-        )
+/**
+ * Ejercicio: 
+ *  Realizar 2 peticiones HTTP (ajax) una después de otra.
+ *  
+ *  La primera debe de obtener el personaje de Star Wars:
+ *   Luke Skywalker, llamando el endpoint:   /people/1/
+ * 
+ *  La segunda petición, debe de ser utilizando el objeto
+ *  de la petición anterior, y tomar la especie (species),
+ *  que es un arreglo de URLs (array), dentro de ese arreglo, 
+ *  tomar la primera posición y realizar la llamada a ese URL,
+ *  el cual debería de traer información sobre su especie (Human)
+ */
 
-// creando un formulario
-const form = document.createElement('form');
-const inputEmail = document.createElement('input');
-const inputPass  = document.createElement('input');
-const submitBtn  = document.createElement('button');
+// Respuesta esperada:
+// Información sobre los humanos en el universo de Star Wars
+// Ejemplo de la data esperada
+/*
+ { name: "Human", classification: "mammal", designation: "sentient", average_height: "180", skin_colors: "caucasian, black, asian, hispanic", …}
+*/
 
-// Configuraciones
-inputEmail.type = 'email';
-inputEmail.placeholder = 'Email';
-inputEmail.value = 'eve.holt@reqres.in';
+// Respuesta esperada con Mayor dificultad
+// Retornar el siguiente objeto con la información de ambas peticiones
+// Recordando que se disparan una después de la otra, 
+// con el URL que viene dentro del arreglo de 'species'
 
-inputPass.type = 'password';
-inputPass.placeholder = 'Password';
-inputPass.value = 'cityslicka';
+// Tip: investigar sobre la función zip: 
+//      Que permite combinar observables en un arreglo de valores
+// https://rxjs-dev.firebaseapp.com/api/index/function/zip
 
-submitBtn.innerHTML = 'Ingresar';
-
-form.append( inputEmail, inputPass, submitBtn );
-document.querySelector('body').append( form );
-
-// Streams
-const submitForm$ = fromEvent<Event>( form, 'submit' )
-    .pipe(
-        tap( ev => ev.preventDefault() ),
-        map( ev => {
-            const data = {
-                email: ev.target[0].value,
-                password: ev.target[1].value
-            }
-            return data;
-        }),
-        //mergeMap(peticionHttpLogin)
-        //switchMap(peticionHttpLogin)
-        exhaustMap( data => peticionHttpLogin(data) )
-    );
+// Ejemplo de la data esperada:
+/*
+    especie: {name: "Human", classification: "mammal", designation: "sentient", average_height: "180", skin_colors: "caucasian, black, asian, hispanic", …}
+    personaje: {name: "Luke Skywalker", height: "172", mass: "77", hair_color: "blond", skin_color: "fair", …}
+*/
 
 
-submitForm$.subscribe( token => {
-    console.log(token);
-})
+(() =>{
+
+    // No tocar ========================================================
+    const SW_API = 'https://swapi.dev/api';                     
+    const getRequest = ( url: string ) => ajax.getJSON<any>(url);
+    // ==================================================================
+
+    // Realizar el llamado al URL para obtener a Luke Skywalker
+    getRequest(`${SW_API}/people/2`).pipe(
+        // Realizar los operadores respectivos aquí
+        switchMap(resp => zip(of(resp), getRequest(resp.species[0]))),
+        map(([personaje, especie]) => ({personaje, especie}))
+             
+
+        
+
+    // NO TOCAR el subscribe ni modificarlo ==
+    ).subscribe( console.log )           // ==
+    // =======================================
+
+
+
+})();
+
+		

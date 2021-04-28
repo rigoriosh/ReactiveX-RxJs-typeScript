@@ -1,3 +1,5 @@
+import {from} from "rxjs";
+import { map } from "rxjs/operators";
 /**
  * Ejercicio: 
  * El objetivo de es realizar la misma impresión, pero usando observables
@@ -12,7 +14,7 @@
  * Pingüino
  * Hiedra Venenosa
  */
-(() =>{
+(() =>{ // funcion auto invocada
 
 
   const nombres = ['batman', 'joker', 'doble cara', 'pingüino', 'hiedra venenosa'];
@@ -21,9 +23,15 @@
 
 
   // Cambiar este FOR OF, por un observable y capitalizar las emisiones
-  for( let nombre of nombres ) {
+  /* for( let nombre of nombres ) {
     console.log( capitalizar(nombre) )
-  }
+  } */
+
+  // solución
+
+  from(nombres).pipe(
+      map(capitalizar)
+  ).subscribe(console.log)
 
 
 
